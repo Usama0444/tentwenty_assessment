@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class SearchableAppBar extends StatefulWidget {
-  const SearchableAppBar({super.key});
+  final Function(bool) onSearchToggle;
+
+  const SearchableAppBar({super.key, required this.onSearchToggle});
 
   @override
   _SearchableAppBarState createState() => _SearchableAppBarState();
@@ -21,7 +23,7 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
   Widget build(BuildContext context) {
     return Container(
       color: Theme.of(context).appBarTheme.backgroundColor ?? Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child:
           _isSearching
               ? Row(
@@ -42,15 +44,21 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
                           color: Colors.grey,
                           size: 24,
                         ),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.close, color: Colors.grey),
-                          onPressed: () {
-                            setState(() {
-                              _isSearching = false;
-                              _searchController.clear();
-                            });
-                          },
-                        ),
+                        suffixIcon:
+                            _searchController.text.isNotEmpty
+                                ? IconButton(
+                                  icon: const Icon(
+                                    Icons.clear,
+                                    color: Colors.grey,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _searchController.clear();
+                                    });
+                                  },
+                                )
+                                : null,
                         filled: true,
                         fillColor: Colors.grey[200],
                         border: OutlineInputBorder(
@@ -67,6 +75,18 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
                       },
                     ),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black),
+                    onPressed: () {
+                      setState(() {
+                        _isSearching = false;
+                        _searchController.clear();
+                      });
+                      widget.onSearchToggle(
+                        false,
+                      ); // Notify parent to switch back
+                    },
+                  ),
                 ],
               )
               : Row(
@@ -82,6 +102,9 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
                       setState(() {
                         _isSearching = true;
                       });
+                      widget.onSearchToggle(
+                        true,
+                      ); // Notify parent to switch to GridView
                     },
                   ),
                 ],
