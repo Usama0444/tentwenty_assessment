@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tentwenty_assessment/views/details/date_selection_screen.dart';
+import 'package:tentwenty_assessment/views/details/movie_details_screen.dart';
 import 'package:tentwenty_assessment/views/watch.dart';
 
 void main() {
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: WatchScreen(),
+      home: DateSelectionScreen(),
     );
   }
 }

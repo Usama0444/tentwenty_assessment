@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 
 class SearchableAppBar extends StatefulWidget {
   final Function(bool) onSearchToggle;
+  final TextEditingController searchController;
+  final VoidCallback onSearchTextChanged;
 
-  const SearchableAppBar({super.key, required this.onSearchToggle});
+  const SearchableAppBar({
+    super.key,
+    required this.onSearchToggle,
+    required this.searchController,
+    required this.onSearchTextChanged,
+  });
 
   @override
   _SearchableAppBarState createState() => _SearchableAppBarState();
@@ -11,11 +18,10 @@ class SearchableAppBar extends StatefulWidget {
 
 class _SearchableAppBarState extends State<SearchableAppBar> {
   bool _isSearching = false;
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
-    _searchController.dispose();
+    widget.searchController.dispose();
     super.dispose();
   }
 
@@ -30,7 +36,7 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
                 children: [
                   Expanded(
                     child: TextField(
-                      controller: _searchController,
+                      controller: widget.searchController,
                       autofocus: true,
                       style: const TextStyle(color: Colors.black, fontSize: 16),
                       decoration: InputDecoration(
@@ -44,21 +50,17 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
                           color: Colors.grey,
                           size: 24,
                         ),
-                        suffixIcon:
-                            _searchController.text.isNotEmpty
-                                ? IconButton(
-                                  icon: const Icon(
-                                    Icons.clear,
-                                    color: Colors.grey,
-                                    size: 20,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _searchController.clear();
-                                    });
-                                  },
-                                )
-                                : null,
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.grey),
+                          onPressed: () {
+                            setState(() {
+                              _isSearching = false;
+                              widget.searchController.clear();
+                            });
+                            widget.onSearchToggle(false);
+                            widget.onSearchTextChanged();
+                          },
+                        ),
                         filled: true,
                         fillColor: Colors.grey[200],
                         border: OutlineInputBorder(
@@ -71,21 +73,10 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
                         ),
                       ),
                       onChanged: (value) {
-                        setState(() {}); // Update suffix icon visibility
+                        setState(() {});
+                        widget.onSearchTextChanged();
                       },
                     ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close, color: Colors.black),
-                    onPressed: () {
-                      setState(() {
-                        _isSearching = false;
-                        _searchController.clear();
-                      });
-                      widget.onSearchToggle(
-                        false,
-                      ); // Notify parent to switch back
-                    },
                   ),
                 ],
               )
@@ -102,9 +93,7 @@ class _SearchableAppBarState extends State<SearchableAppBar> {
                       setState(() {
                         _isSearching = true;
                       });
-                      widget.onSearchToggle(
-                        true,
-                      ); // Notify parent to switch to GridView
+                      widget.onSearchToggle(true);
                     },
                   ),
                 ],
